@@ -13,8 +13,8 @@ MSG_RANDIDX = -1
 MSG_DELAY = MSG_MAXLEN
 MSG_START = 0
 MSG_END = MSG_MAXLEN
-MSG_OUTPUT = True
-SHOW_RESOLUTION = False
+MSG_OUTPUT = False
+SHOW_RESOLUTION = True
 SHOW_ENEMY_ATTACKS = False
 
 #########################
@@ -611,13 +611,51 @@ class Factory(object):
                 if (turn > 0):
                     curState.tick()
                 # Resolves Battles
+                curTtt = 0
+                tttPackets = []
                 while (packetIdx < len(self.incomming) and self.incomming[packetIdx].ttt <= turn):
                     # print("Turn {0}:".format(turn), file=sys.stderr)
                     # print("Packet: Owner->{0} | Troops->{1}".format(self.incomming[packetIdx].owner, self.incomming[packetIdx].size), file=sys.stderr)
                     # print("Current Troops in Factory: {0}".format(curState.troops), file=sys.stderr)
-                    curState.procPacket(self.incomming[packetIdx])
+                    #BUG: Need to resolve incomming packets against each other first
+                    if (self.incomming[packetIdx].ttt > curTtt):
+                        curTtt = self.incomming[packetIdx].ttt
+                        # Process last ttt's list of packets
+                        if (len(tttPackets) == 1): # Only 1 packet
+                            curState.procPacket(tttPackets[-1])
+                            del tttPackets[:]
+                        elif (len(tttPackets) > 1):
+                            curTroops = 0
+                            for packet in tttPackets:
+                                if (packet.owner == 1):
+                                    curTroops += packet.size
+                                else:
+                                    curTroops -= packet.size
+                            curOwner = 1 if curTroops > 0 else -1
+                            args = (curOwner, tttPackets[-1].origin, self.ID, abs(curTroops), 0)
+                            newPacket = TroopMsg((random.randint(2,100)*-100), args)
+                            curState.procPacket(newPacket)
+                            del tttPackets[:]
+                    if (self.incomming[packetIdx].ttt == curTtt):
+                        tttPackets.append(self.incomming[packetIdx])
                     # print("Resolved Troops in Factory: {0}".format(curState.troops), file=sys.stderr)
                     packetIdx += 1
+                # Process the last turn's packets
+                if (len(tttPackets) == 1): # Only 1 packet
+                    curState.procPacket(tttPackets[-1])
+                    del tttPackets[:]
+                elif (len(tttPackets) > 1):
+                    curTroops = 0
+                    for packet in tttPackets:
+                        if (packet.owner == 1):
+                            curTroops += packet.size
+                        else:
+                            curTroops -= packet.size
+                    curOwner = 1 if curTroops > 0 else -1
+                    args = (curOwner, tttPackets[-1].origin, self.ID, abs(curTroops), 0)
+                    newPacket = TroopMsg((random.randint(2,100)*-100), args)
+                    curState.procPacket(newPacket)
+                    del tttPackets[:]
                 # Explodes bombs
                 for bomb in bombInfo:
                     #BUG_FIX: bomb.ttt < 1 ==> turn >= bomb.ttt
@@ -1205,7 +1243,7 @@ while True:
     CYBORGS_OWN = 0
     CYBORGS_ENEMY = 0
     myFactories = []
-    simulIDCounter = -10000
+    simulIDCounter = -100
     for i in range(NUM_FACTORIES): # Ticks each factory
         factoryInfo[i].tick()
         simulFac[i].tick()
