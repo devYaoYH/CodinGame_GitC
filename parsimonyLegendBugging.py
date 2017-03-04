@@ -14,7 +14,7 @@ MSG_DELAY = MSG_MAXLEN
 MSG_START = 0
 MSG_END = MSG_MAXLEN
 MSG_OUTPUT = False
-SHOW_RESOLUTION = True
+SHOW_RESOLUTION = False
 SHOW_ENEMY_ATTACKS = False
 
 #########################
@@ -28,6 +28,14 @@ HITCHHIKER_GALAXY_QUOTES = [u'\u201cListen, three eyes,\u201d he said, \u201cdon
 SIMULATE_ENEMY = True
 BOMB_FOLLOWUP = False
 
+########################
+# Behavioural Controls #
+########################
+MAP_RUSH_SIZE = 10
+BOMB_SCORE_THRESHOLD = 0.57
+MAX_LINK_DISTANCE = 7
+ENEMY_MAX_LINK = 7
+
 # Game Statics
 MAX_INT = 65535
 FACTORY_UPGRADE_COST = 10
@@ -35,23 +43,20 @@ BOMB_PRODUCTION_COOLDOWN = 5
 
 # Target Scoring Constants
 PRODUCTION_MULTIPLIER = 10
-MAP_RUSH_SIZE = 10
-BOMB_SCORE_THRESHOLD = 1.00
 BOMB_TROOP_THRESHOLD = 25
 
 # Movement Constants
 TROOP_OFFENSIVE = 1.00 # Sends this % of troops against superior enemies
 TROOP_DEFENSIVE = 1.00 # Sends this % of troops to reinforce friendly targets
-TROOP_OFFENSIVE_MULTIPLIER = 1.17
+TROOP_OFFENSIVE_MULTIPLIER = 1.00
 TROOP_EXCESS_NEUTRAL = 1
 TROOP_EXCESS_ENEMY = 1
-ENEMY_OFFENSIVE = 1.53 # How offensive is the enemy
+ENEMY_OFFENSIVE = 1.97 # How offensive is the enemy
 ENEMY_DEFENSIVE = 1.00 # How defensive is the enemy
 ENEMY_EXCESS_NEUTRAL = 1
 ENEMY_EXCESS_ENEMY = 1
 
 # Game Variables
-MAX_LINK_DISTANCE = 7
 NUM_FACTORIES = 0
 INITIAL_FACTORY = -1
 INITIAL_FACTORY_ENEMY = -1
@@ -352,7 +357,7 @@ def simulateEnemySmart(enemyFac, resolutions):
         targetStates = resolutions[targetFac.ID]
         ttt = adjMatrix[enemyFac.ID][targetFac.ID]
         # Do not simulate enemy movements beyond immediacy
-        if (ttt > 2):
+        if (ttt > ENEMY_MAX_LINK):
             continue
         tttState = targetStates[ttt]
         if (SHOW_ENEMY_ATTACKS):
@@ -617,7 +622,7 @@ class Factory(object):
                     # print("Turn {0}:".format(turn), file=sys.stderr)
                     # print("Packet: Owner->{0} | Troops->{1}".format(self.incomming[packetIdx].owner, self.incomming[packetIdx].size), file=sys.stderr)
                     # print("Current Troops in Factory: {0}".format(curState.troops), file=sys.stderr)
-                    #BUG: Need to resolve incomming packets against each other first
+                    #BUG_FIX: Resolves all packets comming at the same time prior to resolving to curState
                     if (self.incomming[packetIdx].ttt > curTtt):
                         curTtt = self.incomming[packetIdx].ttt
                         # Process last ttt's list of packets
@@ -882,10 +887,11 @@ class Factory(object):
                 if (targetTroops <= curTroops): # Can overwhelm target
                     print("Overwhelming...", file=sys.stderr)
                     targetAttack = True
-                elif (targetTroops <= curTroops+self.production): # Able to target next turn
-                    print("Suspend attacks", file=sys.stderr)
-                    self.troops = curTroops
-                    return self.actions
+                #EXPERIMENTAL: Disabling suspension of attacks
+                # elif (targetTroops <= curTroops+self.production): # Able to target next turn
+                #     print("Suspend attacks", file=sys.stderr)
+                #     self.troops = curTroops
+                #     return self.actions
                 # else: # Unable to overwhelm target immediately
                     targetTroops = int(self.TROOP_OFFENSIVE*curTroops)
                     print("Cannot overwhelm, sending {0} troops".format(targetTroops), file=sys.stderr)
@@ -1329,6 +1335,14 @@ while True:
                 break
             target = targetTup[0]
             score = targetTup[1]
+            #EXPERIMENTAL: Do not bomb targets we're currently attacking
+            targetIncomming = factoryInfo[target].incomming
+            attacking = False
+            for packet in targetIncomming:
+                if (packet.owner == 1):
+                    attacking = True
+            if (attacking):
+                continue
             # Find the closest base to launch bomb from
             nearestFactory = myFactories[0]
             nearestDistance = MAX_INT

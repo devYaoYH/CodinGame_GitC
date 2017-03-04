@@ -13,7 +13,7 @@ MSG_RANDIDX = -1
 MSG_DELAY = MSG_MAXLEN
 MSG_START = 0
 MSG_END = MSG_MAXLEN
-MSG_OUTPUT = True
+MSG_OUTPUT = False
 SHOW_RESOLUTION = False
 SHOW_ENEMY_ATTACKS = False
 
@@ -28,6 +28,14 @@ HITCHHIKER_GALAXY_QUOTES = [u'\u201cListen, three eyes,\u201d he said, \u201cdon
 SIMULATE_ENEMY = True
 BOMB_FOLLOWUP = False
 
+########################
+# Behavioural Controls #
+########################
+MAP_RUSH_SIZE = 10
+BOMB_SCORE_THRESHOLD = 0.57
+MAX_LINK_DISTANCE = 7
+ENEMY_MAX_LINK = 7
+
 # Game Statics
 MAX_INT = 65535
 FACTORY_UPGRADE_COST = 10
@@ -35,23 +43,20 @@ BOMB_PRODUCTION_COOLDOWN = 5
 
 # Target Scoring Constants
 PRODUCTION_MULTIPLIER = 10
-MAP_RUSH_SIZE = 10
-BOMB_SCORE_THRESHOLD = 0.57
 BOMB_TROOP_THRESHOLD = 25
 
 # Movement Constants
 TROOP_OFFENSIVE = 1.00 # Sends this % of troops against superior enemies
 TROOP_DEFENSIVE = 1.00 # Sends this % of troops to reinforce friendly targets
-TROOP_OFFENSIVE_MULTIPLIER = 1.17
+TROOP_OFFENSIVE_MULTIPLIER = 1.00
 TROOP_EXCESS_NEUTRAL = 1
 TROOP_EXCESS_ENEMY = 1
-ENEMY_OFFENSIVE = 1.53 # How offensive is the enemy
+ENEMY_OFFENSIVE = 1.97 # How offensive is the enemy
 ENEMY_DEFENSIVE = 1.00 # How defensive is the enemy
 ENEMY_EXCESS_NEUTRAL = 1
 ENEMY_EXCESS_ENEMY = 1
 
 # Game Variables
-MAX_LINK_DISTANCE = 7
 NUM_FACTORIES = 0
 INITIAL_FACTORY = -1
 INITIAL_FACTORY_ENEMY = -1
@@ -160,7 +165,7 @@ def scoreRedistribution(tgtID, curID, closestEnemyDistance):
     # print("{0} Score: {1}".format(tgtID, score), file=sys.stderr)
     return score
 
-def scoreUpgrade(tgtID, curID, closestEnemyDistance):
+def scoreUpgrade(tgtID, curID, closestEnemyDistance): #EXPERIMENTAL: Scoring for which factory to upgrade first
     distanceMultiplier = closestEnemyDistance**0.5
     score = distanceMultiplier
     # print("{0} Score: {1}".format(tgtID, score), file=sys.stderr)
@@ -175,6 +180,7 @@ def scoreBomb(tgtID, curID, resolutions):
     distanceMultiplier = (1/max(1,(ttt**2)))
     # print("Dist Mult: {0} | ttt: {1}".format(distanceMultiplier, ttt), file=sys.stderr)
     score = 0
+    #EXPERIMENTAL: Do not include production reward if factory is on cooldown
     if (tttState.cooldown <= 0):
         score += tttState.production*PRODUCTION_MULTIPLIER*distanceMultiplier # Rewards production
     # print("Production score: {0}".format(score), file=sys.stderr)
@@ -351,7 +357,7 @@ def simulateEnemySmart(enemyFac, resolutions):
         targetStates = resolutions[targetFac.ID]
         ttt = adjMatrix[enemyFac.ID][targetFac.ID]
         # Do not simulate enemy movements beyond immediacy
-        if (ttt > 2):
+        if (ttt > ENEMY_MAX_LINK):
             continue
         tttState = targetStates[ttt]
         if (SHOW_ENEMY_ATTACKS):
@@ -610,16 +616,55 @@ class Factory(object):
                 if (turn > 0):
                     curState.tick()
                 # Resolves Battles
+                curTtt = 0
+                tttPackets = []
                 while (packetIdx < len(self.incomming) and self.incomming[packetIdx].ttt <= turn):
                     # print("Turn {0}:".format(turn), file=sys.stderr)
                     # print("Packet: Owner->{0} | Troops->{1}".format(self.incomming[packetIdx].owner, self.incomming[packetIdx].size), file=sys.stderr)
                     # print("Current Troops in Factory: {0}".format(curState.troops), file=sys.stderr)
-                    curState.procPacket(self.incomming[packetIdx])
+                    #BUG_FIX: Resolves all packets comming at the same time prior to resolving to curState
+                    if (self.incomming[packetIdx].ttt > curTtt):
+                        curTtt = self.incomming[packetIdx].ttt
+                        # Process last ttt's list of packets
+                        if (len(tttPackets) == 1): # Only 1 packet
+                            curState.procPacket(tttPackets[-1])
+                            del tttPackets[:]
+                        elif (len(tttPackets) > 1):
+                            curTroops = 0
+                            for packet in tttPackets:
+                                if (packet.owner == 1):
+                                    curTroops += packet.size
+                                else:
+                                    curTroops -= packet.size
+                            curOwner = 1 if curTroops > 0 else -1
+                            args = (curOwner, tttPackets[-1].origin, self.ID, abs(curTroops), 0)
+                            newPacket = TroopMsg((random.randint(2,100)*-100), args)
+                            curState.procPacket(newPacket)
+                            del tttPackets[:]
+                    if (self.incomming[packetIdx].ttt == curTtt):
+                        tttPackets.append(self.incomming[packetIdx])
                     # print("Resolved Troops in Factory: {0}".format(curState.troops), file=sys.stderr)
                     packetIdx += 1
+                # Process the last turn's packets
+                if (len(tttPackets) == 1): # Only 1 packet
+                    curState.procPacket(tttPackets[-1])
+                    del tttPackets[:]
+                elif (len(tttPackets) > 1):
+                    curTroops = 0
+                    for packet in tttPackets:
+                        if (packet.owner == 1):
+                            curTroops += packet.size
+                        else:
+                            curTroops -= packet.size
+                    curOwner = 1 if curTroops > 0 else -1
+                    args = (curOwner, tttPackets[-1].origin, self.ID, abs(curTroops), 0)
+                    newPacket = TroopMsg((random.randint(2,100)*-100), args)
+                    curState.procPacket(newPacket)
+                    del tttPackets[:]
                 # Explodes bombs
                 for bomb in bombInfo:
-                    if (bomb.owner == 1 and bomb.target == self.ID and bomb.ttt < 1):
+                    #BUG_FIX: bomb.ttt < 1 ==> turn >= bomb.ttt
+                    if (bomb.owner == 1 and bomb.target == self.ID and turn >= bomb.ttt):
                         curState.bombed()
                 # Stores current turn simulated result
                 args = (curState.owner, curState.troops, curState.production, curState.cooldown)
@@ -842,10 +887,11 @@ class Factory(object):
                 if (targetTroops <= curTroops): # Can overwhelm target
                     print("Overwhelming...", file=sys.stderr)
                     targetAttack = True
-                elif (targetTroops <= curTroops+self.production): # Able to target next turn
-                    print("Suspend attacks", file=sys.stderr)
-                    self.troops = curTroops
-                    return self.actions
+                #EXPERIMENTAL: Disabling suspension of attacks
+                # elif (targetTroops <= curTroops+self.production): # Able to target next turn
+                #     print("Suspend attacks", file=sys.stderr)
+                #     self.troops = curTroops
+                #     return self.actions
                 # else: # Unable to overwhelm target immediately
                     targetTroops = int(self.TROOP_OFFENSIVE*curTroops)
                     print("Cannot overwhelm, sending {0} troops".format(targetTroops), file=sys.stderr)
@@ -892,7 +938,7 @@ class Factory(object):
         for adj in adjList[self.ID]:
             weightedTargets.append((adj, scoreUpgrade(adj[0], self.ID, factoryInfo[adj[0]].closestEnemy()[1])))
         weightedTargets = sorted(weightedTargets, key=lambda x: x[1], reverse=True)
-        # Sends troops based on priority
+        #EXPERIMENTAL: Sends troops based on priority
         for targetTup in weightedTargets:
             print("Factory {0} score: {1}".format(targetTup[0][0], targetTup[1]), file=sys.stderr)
             adj = targetTup[0]
@@ -1203,7 +1249,7 @@ while True:
     CYBORGS_OWN = 0
     CYBORGS_ENEMY = 0
     myFactories = []
-    simulIDCounter = -10000
+    simulIDCounter = -100
     for i in range(NUM_FACTORIES): # Ticks each factory
         factoryInfo[i].tick()
         simulFac[i].tick()
@@ -1243,7 +1289,7 @@ while True:
             if (curFac.owner == -1 and INITIAL_FACTORY_ENEMY == -1):
                 INITIAL_FACTORY_ENEMY = curFac.ID
     if (adjMatrix[INITIAL_FACTORY][INITIAL_FACTORY_ENEMY] >= MAP_RUSH_SIZE):
-        BOMB_SCORE_THRESHOLD = 1.03
+        BOMB_SCORE_THRESHOLD = 1.00
 
     # Searches for frontline factory
     FRONTLINE_FACTORY = -1
@@ -1289,6 +1335,14 @@ while True:
                 break
             target = targetTup[0]
             score = targetTup[1]
+            #EXPERIMENTAL: Do not bomb targets we're currently attacking
+            targetIncomming = factoryInfo[target].incomming
+            attacking = False
+            for packet in targetIncomming:
+                if (packet.owner == 1):
+                    attacking = True
+            if (attacking):
+                continue
             # Find the closest base to launch bomb from
             nearestFactory = myFactories[0]
             nearestDistance = MAX_INT
@@ -1314,6 +1368,7 @@ while True:
             if (not launch):
                 continue
             turnMoves.append(BOMB([nearestFactory, target]))
+            #EXPERIMENTAL: Add own bombs into simulation
             args = (1, nearestFactory, target, adjMatrix[nearestFactory][target]+1)
             bombInfo.append(BombMsg(simulIDCounter, args))
             simulIDCounter += 1
