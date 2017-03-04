@@ -1,0 +1,161 @@
+{
+  "swapEnabled": false,
+  "arenaCodeEnabled": false,
+  "numOpponents": 1,
+  "matches": [
+    {
+      "iteration": 0,
+      "gameOptions": "seed=228685203\n",
+      "agents": [
+        {
+          "agentId": -1,
+          "pseudo": "Kodle",
+          "codingamer": null,
+          "specialAgent": true
+        },
+        {
+          "agentId": 1039844,
+          "pseudo": "Krieger44",
+          "codingamer": {
+            "pseudo": "Krieger44",
+            "avatar": 11239755011120
+          }
+        }
+      ],
+      "type": "ide",
+      "swapNum": 0
+    },
+    {
+      "iteration": 1,
+      "gameOptions": "seed=988615899\n",
+      "agents": [
+        {
+          "agentId": -1,
+          "pseudo": "Kodle",
+          "codingamer": null,
+          "specialAgent": true
+        },
+        {
+          "agentId": 1039844,
+          "pseudo": "Krieger44",
+          "codingamer": {
+            "pseudo": "Krieger44",
+            "avatar": 11239755011120
+          }
+        }
+      ],
+      "type": "ide",
+      "swapNum": 0
+    },
+    {
+      "iteration": 2,
+      "gameOptions": "seed=632450775\n",
+      "agents": [
+        {
+          "agentId": -1,
+          "pseudo": "Kodle",
+          "codingamer": null,
+          "specialAgent": true
+        },
+        {
+          "agentId": 1039844,
+          "pseudo": "Krieger44",
+          "codingamer": {
+            "pseudo": "Krieger44",
+            "avatar": 11239755011120
+          }
+        }
+      ],
+      "type": "ide",
+      "swapNum": 0
+    },
+    {
+      "iteration": 3,
+      "gameOptions": "seed=295924700\n",
+      "agents": [
+        {
+          "agentId": -1,
+          "pseudo": "Kodle",
+          "codingamer": null,
+          "specialAgent": true
+        },
+        {
+          "agentId": 1037068,
+          "pseudo": "Agade",
+          "codingamer": {
+            "pseudo": "Agade",
+            "avatar": 1997542876524
+          }
+        }
+      ],
+      "type": "ide",
+      "swapNum": 0
+    },
+    {
+      "iteration": 4,
+      "gameOptions": "seed=783917384\n",
+      "agents": [
+        {
+          "agentId": -1,
+          "pseudo": "Kodle",
+          "codingamer": null,
+          "specialAgent": true
+        },
+        {
+          "agentId": 1039719,
+          "pseudo": "reCurse",
+          "codingamer": {
+            "pseudo": "reCurse",
+            "avatar": 10122035009628
+          }
+        }
+      ],
+      "type": "ide",
+      "swapNum": 0
+    },
+    {
+      "iteration": 5,
+      "gameOptions": "seed=592155104\n",
+      "agents": [
+        {
+          "agentId": -1,
+          "pseudo": "Kodle",
+          "codingamer": null,
+          "specialAgent": true
+        },
+        {
+          "agentId": 1032751,
+          "pseudo": "Gevater_Tod4711",
+          "codingamer": {
+            "pseudo": "Gevater_Tod4711",
+            "avatar": 4573360932214
+          }
+        }
+      ],
+      "type": "ide",
+      "swapNum": 0
+    },
+    {
+      "iteration": 6,
+      "gameOptions": "seed=140353287\n",
+      "agents": [
+        {
+          "agentId": -1,
+          "pseudo": "Kodle",
+          "codingamer": null,
+          "specialAgent": true
+        },
+        {
+          "agentId": 1039341,
+          "pseudo": "Mittzir",
+          "codingamer": {
+            "pseudo": "Mittzir",
+            "avatar": 11182504297373
+          }
+        }
+      ],
+      "type": "ide",
+      "swapNum": 0
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+Game Turn
+
+###One game turn is computed as follows:
+1)	Move existing troops and bombs
+2)	Execute user orders
+3)	Produce new cyborgs in all factories
+4)	Solve battles
+5)	Make the bombs explode
+6)	Check end conditions
+
+Game Input
+
+Initialization input
+Line 1:factoryCount, the number of factories.
+Line 2:linkCount, the number of links between factories.
+Next linkCount lines: 3 space-separated integers factory1, factory2 and distance, where distance is the number of turns needed for a troop to travel between factory1 and factory2.
+
+###Input for one game turn
+Line 1: an integer entityCount, the number of entities.
+Next entityCount lines: an integer entityId, a string entityType and 5 integers arg1, arg2, arg3, arg4 and arg5.
+
+##If entityType equals FACTORY then the arguments are:
+arg1: player that owns the factory: 1 for you, -1 for your opponent and 0 if neutral
+arg2: number of cyborgs in the factory
+arg3: factory production (between 0 and 3)
+arg4: number of turns before the factory starts producing again (0 means that the factory produces normally)
+arg5: unused
+
+##If entityType equals TROOP then the arguments are:
+arg1: player that owns the troop: 1 for you or -1 for your opponent
+arg2: identifier of the factory from where the troop leaves
+arg3: identifier of the factory targeted by the troop
+arg4: number of cyborgs in the troop (positive integer)
+arg5: remaining number of turns before the troop arrives (positive integer)
+
+##If entityType equals BOMB then the arguments are:
+arg1: player that send the bomb: 1 if it is you, -1 if it is your opponent
+arg2: identifier of the factory from where the bomb is launched
+arg3: identifier of the targeted factory if it's your bomb, -1 otherwise
+arg4: remaining number of turns before the bomb explodes (positive integer) if that's your bomb, -1 otherwise
+arg5: unused
+
+
+###Output for one game turn
+
+The available actions are:
+>MOVE source destination cyborgCount: creates a troop of cyborgCount cyborgs at the factory source and sends that troop towards destination. Example: MOVE 2 4 12 will send 12 cyborgs from factory 2 to factory 4.
+>BOMB source destination: creates a bomb in the factory source and sends it towards destination.
+>INC factory: increases the production of the factory factory at the cost of 10 cyborgs.
+>WAIT: does nothing.
+>MSG message: prints a message on the screen.
+You may use several actions by using a semi-colon ;. Example: MOVE 1 3 18 ; MSG Attack Factory 3. If you try to move more cyborgs that there are in the source factory, then all the available units will be sent.
+
+
+###Constraints
+7 ≤ factoryCount ≤ 15
+21 ≤ linkCount ≤ 105
+1 ≤ distance ≤ 20
+Response time for first turn ≤ 1000ms
+Response time for one turn ≤ 50ms
