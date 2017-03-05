@@ -32,8 +32,8 @@ SIMULATE_ENEMY = True
 MAP_RUSH_SIZE = 13
 BOMB_SCORE_THRESHOLD = 0.57
 BOMB_SCORE_THRESHOLD_LARGE = 1.03
-MAX_LINK_DISTANCE = 20
-ENEMY_MAX_LINK = 3
+MAX_LINK_DISTANCE = 7
+ENEMY_MAX_LINK = 2
 
 # Game Statics
 MAX_INT = 65535
@@ -57,6 +57,7 @@ ENEMY_EXCESS_ENEMY = 1
 
 # Game Variables
 NUM_FACTORIES = 0
+GAME_TURNS = 0
 INITIAL_FACTORY = -1
 INITIAL_FACTORY_ENEMY = -1
 FRONTLINE_FACTORY = -1
@@ -147,7 +148,7 @@ def readMaxEnemyTroops(simulStates):
 
 # Decision Making
 def scoreTarget(tgtID, curID):
-    distanceMultiplier = (float)(1.0/max(1,((floydWarMatrix[curID][tgtID]+1)**2)))
+    distanceMultiplier = (float)(1.0/max(1,(adjMatrix[curID][tgtID]**2)))
     score = 0
     score += 7 if factoryInfo[tgtID].troops < factoryInfo[curID].troops else 0
     score += factoryInfo[tgtID].production*PRODUCTION_MULTIPLIER*distanceMultiplier # Rewards production
@@ -156,11 +157,11 @@ def scoreTarget(tgtID, curID):
     return score
 
 def scoreRedistribution(tgtID, curID, closestEnemyDistance):
-    # distanceMultiplier = (float)(1.0/max(1,closestEnemyDistance)**2)
-    score = closestEnemyDistance
-    # score += 7 if factoryInfo[tgtID].troops < factoryInfo[curID].troops else 0
-    # score += factoryInfo[tgtID].production*PRODUCTION_MULTIPLIER*distanceMultiplier # Rewards production
-    # score -= max(5, factoryInfo[tgtID].troops*0.5)*distanceMultiplier # Penalizes troops
+    distanceMultiplier = (float)(1.0/max(1,closestEnemyDistance)**2)
+    score = 0
+    score += 7 if factoryInfo[tgtID].troops < factoryInfo[curID].troops else 0
+    score += factoryInfo[tgtID].production*PRODUCTION_MULTIPLIER*distanceMultiplier # Rewards production
+    score -= max(5, factoryInfo[tgtID].troops*0.5)*distanceMultiplier # Penalizes troops
     # print("{0} Score: {1}".format(tgtID, score), file=sys.stderr)
     return score
 
@@ -278,7 +279,7 @@ def simulateEnemySmart(enemyFac, resolutions):
             return actions
         targetFac = targetTup[0]
         targetStates = resolutions[targetFac.ID]
-        ttt = floydWarMatrix[enemyFac.ID][targetFac.ID] + 1
+        ttt = adjMatrix[enemyFac.ID][targetFac.ID]
         # Do not simulate enemy movements beyond immediacy
         if (ttt > ENEMY_MAX_LINK):
             continue
@@ -470,8 +471,8 @@ class Factory(object):
         nearestFactory = -1
         nearestDistance = MAX_INT
         for facID in range(NUM_FACTORIES):
-            if (floydWarMatrix[self.ID][facID]+1 < nearestDistance and factoryInfo[facID].owner == -1):
-                nearestDistance = floydWarMatrix[self.ID][facID]+1
+            if (adjMatrix[self.ID][facID] < nearestDistance and factoryInfo[facID].owner == -1):
+                nearestDistance = adjMatrix[self.ID][facID]
                 nearestFactory = facID
         if (nearestFactory != -1):
             return (nearestFactory, nearestDistance)
@@ -484,8 +485,8 @@ class Factory(object):
         for facID in range(NUM_FACTORIES):
             if (facID == self.ID):
                 continue
-            if (floydWarMatrix[self.ID][facID]+1 < nearestDistance and factoryInfo[facID].owner == 1):
-                nearestDistance = floydWarMatrix[self.ID][facID]+1
+            if (adjMatrix[self.ID][facID] < nearestDistance and factoryInfo[facID].owner == 1):
+                nearestDistance = adjMatrix[self.ID][facID]
                 nearestFactory = facID
         if (nearestFactory != -1):
             return (nearestFactory, nearestDistance)
@@ -900,7 +901,7 @@ class Factory(object):
         for facID in adjFrontlineFactories:
             print >> sys.stderr, "Adjacent factory distance to enemy: {0}".format(factoryInfo[facID].closestEnemy()[1])
             weightedFrontlineFactories.append((facID, scoreRedistribution(facID, self.ID, factoryInfo[facID].closestEnemy()[1])))
-        weightedFrontlineFactories = sorted(weightedFrontlineFactories, key=lambda x: x[1])
+        weightedFrontlineFactories = sorted(weightedFrontlineFactories, key=lambda x: x[1], reverse=True)
 
         # Sends available troops based on score
         totScore = 0
@@ -957,7 +958,7 @@ class Strategizer(object):
             if (move.isMove()):
                 if (move.size < 1): # Prunes off no troop packets
                     continue
-                args = [1, move.origin, move.target, move.size, adjMatrix[move.origin][move.target]+1]
+                args = [1, move.origin, move.target, move.size, adjMatrix[move.origin][move.target]]
                 curPacket = TroopMsg(self.simulIDCounter, args)
                 self.simulIDCounter += 1
                 self.simulation[move.target].pushIncomming(curPacket)
@@ -1018,7 +1019,7 @@ class Strategizer(object):
             delList = []
             for troop in fac.incomming:
                 closestIntermediate = floydWarPath[troop.origin][fac.ID][0]
-                ttt = floydWarMatrix[troop.origin][closestIntermediate]+1
+                ttt = floydWarMatrix[troop.origin][closestIntermediate]
                 closestIntermediateOwner = self.resolutions[closestIntermediate][ttt].owner
                 # print("Attempting Redirect:\nTroop destination: {0}\nOrigin: {1}\nIntermediate: {2}".format(fac.ID, troop.origin, closestIntermediate), file=sys.stderr)
                 if (closestIntermediate != fac.ID):
@@ -1158,12 +1159,6 @@ for k in range(NUM_FACTORIES):
                 floydWarPath[i][j] = newPath
                 floydWarNext[i][j] = floydWarNext[k][j]
                 floydWarMatrix[i][j] = intermediate
-            elif (intermediate == floydWarMatrix[i][j] and len(floydWarPath[i][j]) < len(floydWarPath[k][j])+1):
-                newPath = [k]
-                newPath.extend(floydWarPath[k][j])
-                floydWarPath[i][j] = newPath
-                floydWarNext[i][j] = floydWarNext[k][j]
-                floydWarMatrix[i][j] = intermediate
 
 # Game Loop
 while True:
@@ -1174,6 +1169,7 @@ while True:
     del turnIncs[:]
     CYBORGS_OWN = 0
     CYBORGS_ENEMY = 0
+    GAME_TURNS += 1
     myFactories = []
     simulIDCounter = -100
     for i in range(NUM_FACTORIES): # Ticks each factory
@@ -1245,7 +1241,7 @@ while True:
         if (len(enemyActions) > 0):
             for action in enemyActions:
                 if (action.isMove()):
-                    args = (-1, action.origin, action.target, action.size, adjMatrix[action.origin][action.target]+1)
+                    args = (-1, action.origin, action.target, action.size, adjMatrix[action.origin][action.target])
                     enemyPacket = TroopMsg(simulIDCounter, args)
                     simulIDCounter += 1
                     factoryInfo[enemyPacket.target].pushIncomming(enemyPacket)
@@ -1293,7 +1289,7 @@ while True:
     for move in turnMoves:
         print >> sys.stderr, move.printCmd()
         if (move.isMove()):
-            args = [1, move.origin, move.target, move.size, adjMatrix[move.origin][move.target]+1]
+            args = [1, move.origin, move.target, move.size, adjMatrix[move.origin][move.target]]
             curPacket = TroopMsg(simulIDCounter, args)
             simulIDCounter += 1
             simulFac[move.target].pushIncomming(curPacket)
