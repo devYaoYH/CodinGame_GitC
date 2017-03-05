@@ -1,7 +1,7 @@
 import random
 import codecs
 fname = "hitchhikers_guide_to_the_galaxy_quotes.txt"
-f = codecs.open(fname, encoding="utf-8")
+f = open(fname, 'r')
 fileList = []
 for line in f:
     fileList.append(line.rstrip())

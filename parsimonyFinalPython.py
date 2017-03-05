@@ -1,7 +1,6 @@
 import sys
 import math
 import random
-from queue import *
 
 ###################
 # Debugging Flags #
@@ -20,21 +19,21 @@ SHOW_ENEMY_ATTACKS = False
 #########################
 # Hitchhiker's Guide :O #
 #########################
-HITCHHIKER_GALAXY_QUOTES = [u'\u201cListen, three eyes,\u201d he said, \u201cdon\u2019t you try to outweird me, I get stranger things than you free with my breakfast cereal.\u201d', u'The Total Perspective Vortex derives its picture of the whole Universe on the principle of extrapolated matter analyses.To explain \u2014 since every piece of matter in the Universe is in some way affected by every other piece of matter in the Universe, it is in theory possible to extrapolate the whole of creation \u2014 every sun, every planet, their orbits, their composition and their economic and social history from, say, one small piece of fairy cake. The man who invented the Total Perspective Vortex did so basically in order to annoy his wife.', u'The disadvantages involved in pulling lots of black sticky slime from out of the ground where it had been safely hidden out of harm\u2019s way, turning it into tar to cover the land with, smoke to fill the air with and pouring the rest into the sea, all seemed to outweigh the advantages of being able to get more quickly from one place to another.', u'It is a well known fact that those people who most want to rule people are, ipso facto, those least suited to do it. To summarize the summary: anyone who is capable of getting themselves made President should on no account be allowed to do the job.', u'\u201cSince we decided a few weeks ago to adopt the leaf as legal tender, we have, of course, all become immensely rich.\u201d', u'He gazed keenly into the distance and looked as if he would quite like the wind to blow his hair back dramatically at that point, but the wind was busy fooling around with some leaves a little way off.', u'\u201cHe was staring at the instruments with the air of one who is trying to convert Fahrenheit to centigrade in his head while his house is burning down.\u201d', u'He hoped and prayed that there wasn\u2019t an afterlife. Then he realized there was a contradiction involved here and merely hoped that there wasn\u2019t an afterlife.', u'Eskimos had over two hundred different words for snow, without which their conversation would probably have got very monotonous. So they would distinguish between thin snow and thick snow, light snow and heavy snow, sludgy snow, brittle snow, snow that came in flurries, snow that came in drifts, snow that came in on the bottom of your neighbor\u2019s boots all over your nice clean igloo floor, the snows of winter, the snows of spring, the snows you remember from your childhood that were so much better than any of your modern snow, fine snow, feathery snow, hill snow, valley snow, snow that falls in the morning, snow that falls at night, snow that falls all of a sudden just when you were going out fishing, and snow that despite all your efforts to train them, the huskies have pissed on.', u'The last time anybody made a list of the top hundred character attributes of New Yorkers, common sense snuck in at number 79.', u'Protect me from knowing what I don\u2019t need to know. Protect me from even knowing that there are things to know that I don\u2019t know. Protect me from knowing that I decided not to know about the things that I decided not to know about. Amen.', u'All you really need to know for the moment is that the universe is a lot more complicated than you might think, even if you start from a position of thinking it\u2019s pretty damn complicated in the first place.', u'Don\u2019t Panic.']
+HITCHHIKER_GALAXY_QUOTES = ['Many were increasingly of the opinion that they\xe2\x80\x99d all made a big mistake in coming down from the trees in the first place. And some said that even the trees had been a bad move, and that no one should ever have left the oceans.', '\xe2\x80\x9cMy doctor says that I have a malformed public-duty gland and a natural deficiency in moral fibre,\xe2\x80\x9d Ford muttered to himself, \xe2\x80\x9cand that I am therefore excused from saving Universes.\xe2\x80\x9d', 'Isn\xe2\x80\x99t it enough to see that a garden is beautiful without having to believe that there are fairies at the bottom of it too?', 'A common mistake that people make when trying to design something completely foolproof is to underestimate the ingenuity of complete fools.', 'Curiously enough, the only thing that went through the mind of the bowl of petunias as it fell was Oh no, not again. Many people have speculated that if we knew exactly why the bowl of petunias had thought that we would know a lot more about the nature of the Universe than we do now.', 'The reason why it was published in the form of a micro sub meson electronic component is that if it were printed in normal book form, an interstellar hitchhiker would require several inconveniently large buildings to carry it around in.', '\xe2\x80\x9cForty-two,\xe2\x80\x9d said Deep Thought, with infinite majesty and calm.', 'Not unnaturally, many elevators imbued with intelligence and precognition became terribly frustrated with the mindless business of going up and down, up and down, experimented briefly with the notion of going sideways, as a sort of existential protest, demanded participation in the decision-making process and finally took to squatting in basements sulking.', 'Make it totally clear that this gun has a right end and a wrong end. Make it totally clear to anyone standing at the wrong end that things are going badly for them. If that means sticking all sort of spikes and prongs and blackened bits all over it then so be it. This is not a gun for hanging over the fireplace or sticking in the umbrella stand, it is a gun for going out and making people miserable with.', 'In the end, it was the Sunday afternoons he couldn\xe2\x80\x99t cope with, and that terrible listlessness that starts to set in about 2:55, when you know you\xe2\x80\x99ve taken all the baths that you can usefully take that day, that however hard you stare at any given paragraph in the newspaper you will never actually read it, or use the revolutionary new pruning technique it describes, and that as you stare at the clock the hands will move relentlessly on to four o\xe2\x80\x99clock, and you will enter the long dark teatime of the soul.', 'He gazed keenly into the distance and looked as if he would quite like the wind to blow his hair back dramatically at that point, but the wind was busy fooling around with some leaves a little way off.', 'He hoped and prayed that there wasn\xe2\x80\x99t an afterlife. Then he realized there was a contradiction involved here and merely hoped that there wasn\xe2\x80\x99t an afterlife.', '\xe2\x80\x9cIt seemed to me,\xe2\x80\x9d said Wonko the Sane, \xe2\x80\x9cthat any civilization that had so far lost its head as to need to include a set of detailed instructions for use in a packet of toothpicks, was no longer a civilization in which I could live and stay sane.\xe2\x80\x9d', '\xe2\x80\x9cNothing travels faster than the speed of light with the possible exception of bad news, which obeys its own special laws.\xe2\x80\x9d', 'Protect me from knowing what I don\xe2\x80\x99t need to know. Protect me from even knowing that there are things to know that I don\xe2\x80\x99t know. Protect me from knowing that I decided not to know about the things that I decided not to know about. Amen.', 'All you really need to know for the moment is that the universe is a lot more complicated than you might think, even if you start from a position of thinking it\xe2\x80\x99s pretty damn complicated in the first place.', 'In the beginning the Universe was created. This has made a lot of people very angry and been widely regarded as a bad move.', 'Don\xe2\x80\x99t Panic.', 'Don\xe2\x80\x99t Panic.']
 
 #######################
 # Behavioural Toggles #
 #######################
 SIMULATE_ENEMY = True
-BOMB_FOLLOWUP = False
 
 ########################
 # Behavioural Controls #
 ########################
-MAP_RUSH_SIZE = 10
+MAP_RUSH_SIZE = 13
 BOMB_SCORE_THRESHOLD = 0.57
+BOMB_SCORE_THRESHOLD_LARGE = 1.03
 MAX_LINK_DISTANCE = 7
-ENEMY_MAX_LINK = 7
+ENEMY_MAX_LINK = 2
 
 # Game Statics
 MAX_INT = 65535
@@ -43,7 +42,7 @@ BOMB_PRODUCTION_COOLDOWN = 5
 
 # Target Scoring Constants
 PRODUCTION_MULTIPLIER = 10
-BOMB_TROOP_THRESHOLD = 21
+BOMB_TROOP_THRESHOLD = 25
 
 # Movement Constants
 TROOP_OFFENSIVE = 1.00 # Sends this % of troops against superior enemies
@@ -148,7 +147,7 @@ def readMaxEnemyTroops(simulStates):
 
 # Decision Making
 def scoreTarget(tgtID, curID):
-    distanceMultiplier = (1/max(1,(adjMatrix[curID][tgtID]**2)))
+    distanceMultiplier = (float)(1.0/max(1,(adjMatrix[curID][tgtID]**2)))
     score = 0
     score += 7 if factoryInfo[tgtID].troops < factoryInfo[curID].troops else 0
     score += factoryInfo[tgtID].production*PRODUCTION_MULTIPLIER*distanceMultiplier # Rewards production
@@ -157,17 +156,11 @@ def scoreTarget(tgtID, curID):
     return score
 
 def scoreRedistribution(tgtID, curID, closestEnemyDistance):
-    distanceMultiplier = (1/max(1,closestEnemyDistance)**2)
+    distanceMultiplier = (float)(1.0/max(1,closestEnemyDistance)**2)
     score = 0
     score += 7 if factoryInfo[tgtID].troops < factoryInfo[curID].troops else 0
     score += factoryInfo[tgtID].production*PRODUCTION_MULTIPLIER*distanceMultiplier # Rewards production
     score -= max(5, factoryInfo[tgtID].troops*0.5)*distanceMultiplier # Penalizes troops
-    # print("{0} Score: {1}".format(tgtID, score), file=sys.stderr)
-    return score
-
-def scoreUpgrade(tgtID, curID, closestEnemyDistance): #EXPERIMENTAL: Scoring for which factory to upgrade first
-    distanceMultiplier = closestEnemyDistance**0.5
-    score = distanceMultiplier
     # print("{0} Score: {1}".format(tgtID, score), file=sys.stderr)
     return score
 
@@ -177,30 +170,30 @@ def scoreBomb(tgtID, curID, resolutions):
     targetStates = resolutions[tgtID]
     ttt = adjMatrix[curID][tgtID]+1
     tttState = targetStates[ttt]
-    distanceMultiplier = (1/max(1,(ttt**2)))
+    distanceMultiplier = (float)(1.0/max(1,(ttt**2)))
     # print("Dist Mult: {0} | ttt: {1}".format(distanceMultiplier, ttt), file=sys.stderr)
     score = 0
-    #EXPERIMENTAL: Do not include production reward if factory is on cooldown
-    if (tttState.cooldown <= 0):
-        score += tttState.production*PRODUCTION_MULTIPLIER*distanceMultiplier # Rewards production
+    score += tttState.production*PRODUCTION_MULTIPLIER*distanceMultiplier # Rewards production
     # print("Production score: {0}".format(score), file=sys.stderr)
     score += max(10, tttState.troops)*distanceMultiplier # Rewards troops
     # print("{0} Score: {1}".format(tgtID, score), file=sys.stderr)
     return score
         
 def should_bomb(tgtID, curID, resolutions):
+    # print("Testing target Factory {0}:".format(tgtID), file=sys.stderr)
     if (tgtID == curID):
         return False
     targetStates = resolutions[tgtID]
     ttt = adjMatrix[curID][tgtID]+1
     tttState = targetStates[ttt]
+    # print("Ttt state: Owner->{0} | Troops->{1} | Production->{2}".format(tttState.owner, tttState.troops, tttState.production), file=sys.stderr)
     if (tttState.owner != -1):
         return False
     if (num_bombs < 1):
         return False
     if (tttState.troops > BOMB_TROOP_THRESHOLD):
         return True
-    if (tttState.production > 0):
+    if (tttState.production > 2):
         return True
     return False
 
@@ -226,14 +219,14 @@ def needed_upgradeTroops(curFac, tgtFac, resolutions):
 
 def needed_reinforcements(ttt, availTroops, resolution):
     arrivalState = resolution[ttt]
-    # print("State: Owner->{0} | Troops->{1}".format(arrivalState.owner, arrivalState.troops), file=sys.stderr)
+    print >> sys.stderr, "State: Owner->{0} | Troops->{1}".format(arrivalState.owner, arrivalState.troops)
     if (arrivalState.production < 1): #TODO: Do not reinforce no production factories?
         return -1
     #TODO: Will be in time to reinforce?
     requestTroopsTup = readMaxAvailTroops(resolution)
     requestTroops = requestTroopsTup[0] # Reads how many troops needed
     requestTurn = requestTroopsTup[1] # Reads when it is needed
-    # print("Requested troops: {0} by turn: {1}".format(requestTroops, requestTurn), file=sys.stderr)
+    print >> sys.stderr, "Requested troops: {0} by turn: {1}".format(requestTroops, requestTurn)
     if (requestTroops < 0):
         return min(availTroops, -requestTroops)
     return -1
@@ -247,7 +240,7 @@ def simulateEnemy(enemyFac):
         return actions
     curTroops = enemyFac.troops
     if (SHOW_ENEMY_ATTACKS):
-        print("Simulating enemy attacks from Factory {0}|Current Troops: {1}".format(enemyFac.ID, curTroops), file=sys.stderr)
+        print >> sys.stderr, "Simulating enemy attacks from Factory {0}|Current Troops: {1}".format(enemyFac.ID, curTroops)
 
     validTargets = []
     for adj in range(NUM_FACTORIES):
@@ -285,7 +278,7 @@ def simulateEnemy(enemyFac):
             return actions
         targetFac = targetTup[0]
         if (SHOW_ENEMY_ATTACKS):
-            print("Enemy attacking: {0}".format(targetFac.ID), file=sys.stderr)
+            print >> sys.stderr, "Enemy attacking: {0}".format(targetFac.ID)
         targetAttack = False
         targetTroops = 0
         # Determines how many troops to send
@@ -304,7 +297,7 @@ def simulateEnemy(enemyFac):
         if (targetAttack):
             actions.append(MOVE([enemyFac.ID, targetFac.ID, targetTroops]))
             if (SHOW_ENEMY_ATTACKS):
-                print(actions[-1].print(), file=sys.stderr)
+                print >> sys.stderr, actions[-1].printCmd()
             curTroops -= targetTroops
     return actions
 
@@ -317,7 +310,7 @@ def simulateEnemySmart(enemyFac, resolutions):
         return actions
     curTroops = min(enemyFac.troops, readMaxEnemyTroops(resolutions[enemyFac.ID])[0])
     if (SHOW_ENEMY_ATTACKS):
-        print("Simulating enemy attacks from Factory {0}|Current Troops: {1}".format(enemyFac.ID, curTroops), file=sys.stderr)
+        print >> sys.stderr, "Simulating enemy attacks from Factory {0}|Current Troops: {1}".format(enemyFac.ID, curTroops)
 
     validTargets = []
     for adj in range(NUM_FACTORIES):
@@ -361,7 +354,7 @@ def simulateEnemySmart(enemyFac, resolutions):
             continue
         tttState = targetStates[ttt]
         if (SHOW_ENEMY_ATTACKS):
-            print("Enemy attacking: {0}".format(targetFac.ID), file=sys.stderr)
+            print >> sys.stderr, "Enemy attacking: {0}".format(targetFac.ID)
         targetAttack = False
         targetTroops = 0
         # Determines how many troops to send
@@ -385,7 +378,7 @@ def simulateEnemySmart(enemyFac, resolutions):
                 targetID = closestIntermediate
             actions.append(MOVE([originID, targetID, targetTroops]))
             if (SHOW_ENEMY_ATTACKS):
-                print(actions[-1].print(), file=sys.stderr)
+                print >> sys.stderr, actions[-1].printCmd()
             curTroops -= targetTroops
     return actions
 
@@ -413,10 +406,6 @@ class TroopMsg(object):
         self.target = args[2]
         self.size = args[3]
         self.ttt = args[4]
-        self.redirect = True
-
-    def avoidRedirect(self):
-        self.redirect = False
 
     def isEnemy(self):
         return (self.owner == -1)
@@ -451,12 +440,8 @@ class MOVE(Action):
         self.origin = int(args[0])
         self.target = int(args[1])
         self.size = int(args[2])
-        self.redirect = True
 
-    def avoidRedirect(self):
-        self.redirect = False
-
-    def print(self):
+    def printCmd(self):
         return "MOVE {0} {1} {2}".format(self.origin, self.target, self.size)
 
 class BOMB(Action):
@@ -466,7 +451,7 @@ class BOMB(Action):
         self.origin = int(args[0])
         self.target = int(args[1])
 
-    def print(self):
+    def printCmd(self):
         return "BOMB {0} {1}".format(self.origin, self.target)
 
 class INC(Action):
@@ -475,7 +460,7 @@ class INC(Action):
         Action.__init__(self, "INC")
         self.origin = int(args[0])
 
-    def print(self):
+    def printCmd(self):
         return "INC {0}".format(self.origin)
 
 class FactorySimulation(object):
@@ -518,7 +503,6 @@ class Factory(object):
         self.outgoing = [] #TODO: not necessary? since outgoing == incomming somewhere else
         self.actions = []
         self.blacklist = [] # Blacklisted enemy targets
-        self.simulResolution = []
         self.TROOP_OFFENSIVE = TROOP_OFFENSIVE # Local threshold
         self.TROOP_DEFENSIVE = TROOP_DEFENSIVE # Local threshold
 
@@ -564,6 +548,20 @@ class Factory(object):
         else:
             return (nearestFactory, MAX_INT)
 
+    def closestFriendly(self):
+        nearestFactory = -1
+        nearestDistance = MAX_INT
+        for facID in range(NUM_FACTORIES):
+            if (facID == self.ID):
+                continue
+            if (adjMatrix[self.ID][facID] < nearestDistance and factoryInfo[facID].owner == 1):
+                nearestDistance = adjMatrix[self.ID][facID]
+                nearestFactory = facID
+        if (nearestFactory != -1):
+            return (nearestFactory, nearestDistance)
+        else:
+            return (nearestFactory, MAX_INT)
+
     def viable_upgrade(self, resolution, prevUpgrades):
         updatedResolutions = []
         # Builds updated states for next FACTORY_UPGRADE_COST turns
@@ -577,15 +575,6 @@ class Factory(object):
         for state in updatedResolutions:
             if (state.owner != 1):
                 return False
-        return True
-
-    def updateSimulatedResolution(self, packet):
-        if (len(self.simulResolution) < 1):
-            self.simulResolution = resolution
-        if (packet.owner != 1):
-            return False
-        for i in range(packet.ttt, len(self.simulResolution)):
-            self.simulResolution[i] += packet.size
         return True
 
     '''
@@ -683,12 +672,12 @@ class Factory(object):
 
         #DEBUG: Prints out states of each turn
         if (SHOW_RESOLUTION):
-            print("======================\nResolved Factory {0}:\n======================".format(self.ID), file=sys.stderr)
-            print("Initial Troop count: {0}".format(self.troops), file=sys.stderr)
+            print >> sys.stderr, "======================\nResolved Factory {0}:\n======================".format(self.ID)
+            print >> sys.stderr, "Initial Troop count: {0}".format(self.troops)
             for i in range(7):
-                print("Step {0}: Owner->{1} | Troops->{2} | Production->{3} | Cooldown->{4}".format(i, simulMap[i].owner, simulMap[i].troops, simulMap[i].production, simulMap[i].cooldown), file=sys.stderr)
-            print("Max Available Units: {0}".format(readMaxAvailTroops(simulMap)[0]), file=sys.stderr)
-            print("Turns before being overrun: {0}".format(readMaxAvailTroops(simulMap)[1]), file=sys.stderr)
+                print >> sys.stderr, "Step {0}: Owner->{1} | Troops->{2} | Production->{3} | Cooldown->{4}".format(i, simulMap[i].owner, simulMap[i].troops, simulMap[i].production, simulMap[i].cooldown)
+            print >> sys.stderr, "Max Available Units: {0}".format(readMaxAvailTroops(simulMap)[0])
+            print >> sys.stderr, "Turns before being overrun: {0}".format(readMaxAvailTroops(simulMap)[1])
         return simulMap # Outputs list of simulated factory state tuples
     
     '''
@@ -699,7 +688,7 @@ class Factory(object):
     '''
     def reinforce(self, simulStates): #TODO: How to bring troops to the front?
         curTroops = min(self.troops, readMaxAvailTroops(simulStates[self.ID])[0])
-        print("Factory {0} Reinforcing...|Current Troops: {1}".format(self.ID, curTroops), file=sys.stderr)
+        print >> sys.stderr, "Factory {0} Reinforcing...|Current Troops: {1}".format(self.ID, curTroops)
         if (curTroops < 1):
             return self.actions
 
@@ -719,14 +708,12 @@ class Factory(object):
                 return self.actions
             target = targetTup[0]
             ttt = floydWarMatrix[self.ID][target]+1
-            print("Reinforcing factory {0}:".format(target), file=sys.stderr)
-            # requestTroops = needed_reinforcements(ttt, curTroops, simulStates[target])
-            #EXPERIMENTAL: using resolutions after every step
+            print >> sys.stderr, "Reinforcing factory {0}:".format(target)
             requestTroops = needed_reinforcements(ttt, curTroops, simulStates[target])
             if (requestTroops < 0):
                 continue
             self.actions.append(MOVE([self.ID, target, requestTroops]))
-            print(self.actions[-1].print(), file=sys.stderr)
+            print >> sys.stderr, self.actions[-1].printCmd()
             curTroops -= requestTroops
 
         self.troops = curTroops
@@ -747,7 +734,7 @@ class Factory(object):
             self.TROOP_OFFENSIVE = TROOP_OFFENSIVE
             self.TROOP_DEFENSIVE = TROOP_DEFENSIVE
         curTroops = min(self.troops, readMaxAvailTroops(simulStates[self.ID])[0])
-        print("Factory {0}|Current Troops: {1}".format(self.ID, curTroops), file=sys.stderr)
+        print >> sys.stderr, "Factory {0}|Current Troops: {1}".format(self.ID, curTroops)
         if (curTroops < 1):
             self.troops = curTroops
             return self.actions
@@ -789,9 +776,8 @@ class Factory(object):
             ttt = floydWarMatrix[self.ID][targetFac.ID]+1
             targetState = simulStates[targetFac.ID][ttt]
             if (targetState.troops == 0 and targetState.owner == 0):
-                print("No cyborgs detected in Factory {0}".format(targetFac.ID), file=sys.stderr)
                 self.actions.append(MOVE([self.ID, targetFac.ID, 1]))
-                print(self.actions[-1].print(), file=sys.stderr)
+                print >> sys.stderr, self.actions[-1].printCmd()
                 curTroops -= 1
                 targetFac = None #TODO: Removes target from list?
         validTargets = [fac for fac in validTargets if fac != None] # Removes None-types
@@ -800,6 +786,18 @@ class Factory(object):
         upgradeFactory = True
         curProduction = self.production
         upgrades = 0
+        #EXPERIMENTAL: Don't too aggressively upgrade factories close to the enemy
+        adjFriendlyTup = self.closestFriendly()
+        adjEnemyTup = self.closestEnemy()
+        if (adjFriendlyTup[0] == -1): # Initial Factory or only factory
+            if (adjEnemyTup[0] != -1):
+                if (adjEnemyTup[1] < MAP_RUSH_SIZE):
+                    upgradeFactory = False
+        if (adjFriendlyTup[0] != -1 and adjEnemyTup[0] != -1):
+            # print("Testing viability for upgrade based on distance to enemy", file=sys.stderr)
+            # print("Distance to friendly factory {0}: {1} | Distance to enemy factory {2}: {3}".format(adjFriendlyTup[0], adjFriendlyTup[1], adjEnemyTup[0], adjEnemyTup[1]), file=sys.stderr)
+            if (adjEnemyTup[1] <= adjFriendlyTup[1] and (CYBORGS_OWN - CYBORGS_ENEMY) < FACTORY_UPGRADE_COST):
+                upgradeFactory = False
         # Decides suitability for upgrading
         while (upgradeFactory):
             # Safety check for troops available
@@ -813,9 +811,9 @@ class Factory(object):
                 targetStates = simulStates[targetFac.ID]
                 ttt = floydWarMatrix[self.ID][targetFac.ID]+1
                 tttState = targetStates[ttt]
-                if (tttState.owner == 0 and tttState.production > 0 and tttState.troops < curTroops):
+                if (tttState.owner == 0 and tttState.production > 0):
                     tttDiff = FACTORY_UPGRADE_COST - ttt
-                    if (tttDiff < 0 or tttState.production*tttDiff > FACTORY_UPGRADE_COST):
+                    if (tttDiff < 0 or tttState.production*tttDiff > FACTORY_UPGRADE_COST and tttState.troops < curTroops):
                         neutralFactories.append(targetFac.ID)
             if (len(neutralFactories) > 0):
                 upgradeFactory = False
@@ -826,7 +824,7 @@ class Factory(object):
             if (upgradeFactory):
                 upgrades += 1
                 curProduction += 1
-                print("Upgrading factory with {0} troops at level {1} production".format(curTroops, factoryInfo[self.ID].production), file=sys.stderr)
+                print >> sys.stderr, "Upgrading factory with {0} troops at level {1} production".format(curTroops, factoryInfo[self.ID].production)
                 self.actions.append(INC([self.ID]))
                 curTroops -= FACTORY_UPGRADE_COST
         
@@ -853,7 +851,7 @@ class Factory(object):
             ignore = False
             for bomb in bombInfo:
                 if (bomb.owner == 1):
-                    # print("Bomb from {0}->{1} arrives in: {2} | Attack arrives in: {3}".format(bomb.origin, bomb.target, bomb.ttt, ttt), file=sys.stderr)
+                    print >> sys.stderr, "Bomb from {0}->{1} arrives in: {2} | Attack arrives in: {3}".format(bomb.origin, bomb.target, bomb.ttt, ttt)
                     if (bomb.target == targetFac.ID and ttt <= bomb.ttt):
                         ignore = True
                         break
@@ -876,7 +874,7 @@ class Factory(object):
             if (targetAttack):
                 overwhelmTargets.append(targetFac)
                 self.actions.append(MOVE([self.ID, targetFac.ID, targetTroops]))
-                print(self.actions[-1].print(), file=sys.stderr)
+                print >> sys.stderr, self.actions[-1].printCmd()
                 curTroops -= targetTroops
 
         # Attacks targets in weighted order
@@ -891,48 +889,35 @@ class Factory(object):
             targetStates = simulStates[targetFac.ID]
             ttt = floydWarMatrix[self.ID][targetFac.ID]+1
             tttState = targetStates[ttt]
-            print("Attacking: {0} | ttt: {1} | tttState: Owner->{2} Troops->{3}".format(targetFac.ID, ttt, tttState.owner, tttState.troops), file=sys.stderr)
+            print >> sys.stderr, "Attacking: {0} | ttt: {1} | tttState: Owner->{2} Troops->{3}".format(targetFac.ID, ttt, tttState.owner, tttState.troops)
             # Determines how many troops to send
             targetAttack = False
             targetTroops = 0
             if (tttState.owner == 0): # Neutral Target
                 targetTroops = tttState.troops+TROOP_EXCESS_NEUTRAL
                 if (targetTroops <= curTroops): # Can overwhelm target
-                    print("Overwhelming...", file=sys.stderr)
+                    print >> sys.stderr, "Overwhelming..."
                     targetAttack = True
                 #EXPERIMENTAL: Disabling suspension of attacks
                 # elif (targetTroops <= curTroops+self.production): # Able to target next turn
                 #     print("Suspend attacks", file=sys.stderr)
                 #     self.troops = curTroops
                 #     return self.actions
-                # else: # Unable to overwhelm target immediately
+                else: # Unable to overwhelm target immediately
                     targetTroops = int(self.TROOP_OFFENSIVE*curTroops)
-                    print("Cannot overwhelm, sending {0} troops".format(targetTroops), file=sys.stderr)
+                    print >> sys.stderr, "Cannot overwhelm, sending {0} troops".format(targetTroops)
                     targetAttack = True
             elif (tttState.owner == -1): # Enemy Target
                 # We only attack when our attack can overwhelm enemy
                 targetTroops = int((tttState.troops+TROOP_EXCESS_ENEMY)*TROOP_OFFENSIVE_MULTIPLIER)+1
                 if (targetTroops <= curTroops):
-                    print("ENEMY! Sending {0} troops".format(targetTroops), file=sys.stderr)
+                    print >> sys.stderr, "ENEMY! Sending {0} troops".format(targetTroops)
                     targetAttack = True
             # Issues attack command if available
             if (targetAttack):
                 self.actions.append(MOVE([self.ID, targetFac.ID, targetTroops]))
-                print(self.actions[-1].print(), file=sys.stderr)
+                print >> sys.stderr, self.actions[-1].printCmd()
                 curTroops -= targetTroops
-        # Sends some troops off towards bombed enemy targets
-        if (BOMB_FOLLOWUP):
-            if (curTroops > 0):
-                for bomb in bombInfo:
-                    if (curTroops < 1):
-                        self.troops = curTroops
-                        return self.actions
-                    if (bomb.owner == 1 and adjMatrix[self.ID][bomb.target] <= bomb.ttt):
-                        moveAction = MOVE([self.ID, bomb.target, 1])
-                        moveAction.avoidRedirect()
-                        self.actions.append(moveAction)
-                        curTroops -= 1
-
         self.troops = curTroops
         return self.actions
 
@@ -942,27 +927,22 @@ class Factory(object):
     '''
     def upgrade(self, simulStates):
         curTroops = min(self.troops, readMaxAvailTroops(simulStates[self.ID])[0])
-        print("Factory {0} Sending troops for Upgrading...|Current Troops: {1}".format(self.ID, curTroops), file=sys.stderr)
+        print >> sys.stderr, "Factory {0} Sending troops for Upgrading...|Current Troops: {1}".format(self.ID, curTroops)
         if (curTroops < 1):
             self.troops = curTroops
             return self.actions
-        # Scans and weights nearby factories
-        weightedTargets = []
+        # Scans for nearby factories
         for adj in adjList[self.ID]:
-            weightedTargets.append((adj, scoreUpgrade(adj[0], self.ID, factoryInfo[adj[0]].closestEnemy()[1])))
-        weightedTargets = sorted(weightedTargets, key=lambda x: x[1], reverse=True)
-        #EXPERIMENTAL: Sends troops based on priority
-        for targetTup in weightedTargets:
-            print("Factory {0} score: {1}".format(targetTup[0][0], targetTup[1]), file=sys.stderr)
-            adj = targetTup[0]
             if (curTroops < 1):
                 self.troops = curTroops
                 return self.actions
             adjFac = factoryInfo[adj[0]]
+            #EXPERIMENTAL: We send units in bulk
             requestTroops = min(curTroops, needed_upgradeTroops(self, adjFac, simulStates))
+            # requestTroops = needed_upgradeTroops(self, adjFac, simulStates)
             if (requestTroops > 0 and requestTroops <= curTroops):
                 self.actions.append(MOVE([self.ID, adjFac.ID, requestTroops]))
-                print(self.actions[-1].print(), file=sys.stderr)
+                print >> sys.stderr, self.actions[-1].printCmd()
                 curTroops -= requestTroops
         self.troops = curTroops
         return self.actions
@@ -974,7 +954,7 @@ class Factory(object):
     '''
     def redistribute(self, simulStates):
         curTroops = min(self.troops, readMaxAvailTroops(simulStates[self.ID])[0])
-        print("Factory {0} Redistributing...|Current Troops: {1}".format(self.ID, curTroops), file=sys.stderr)
+        print >> sys.stderr, "Factory {0} Redistributing...|Current Troops: {1}".format(self.ID, curTroops)
         if (curTroops < 1):
             return self.actions
 
@@ -982,13 +962,13 @@ class Factory(object):
         # Get connected friendly reinforcible factories
         adjMyFactories = [facTup[0] for facTup in adjList[self.ID] if (factoryInfo[facTup[0]].owner == 1)]
         myDistToEnemy = self.closestEnemy()[1]
-        print("My distance to enemy: {0}".format(myDistToEnemy), file=sys.stderr)
+        print >> sys.stderr, "My distance to enemy: {0}".format(myDistToEnemy)
        
         # Get list of 'frontline' friendly factories
         adjFrontlineFactories = [facID for facID in adjMyFactories if (len([enID for enID in range(NUM_FACTORIES) if factoryInfo[enID].owner == -1]) > 0) and factoryInfo[facID].closestEnemy()[1] < myDistToEnemy]
         weightedFrontlineFactories = []
         for facID in adjFrontlineFactories:
-            print("Adjacent factory distance to enemy: {0}".format(factoryInfo[facID].closestEnemy()[1]), file=sys.stderr)
+            print >> sys.stderr, "Adjacent factory distance to enemy: {0}".format(factoryInfo[facID].closestEnemy()[1])
             weightedFrontlineFactories.append((facID, scoreRedistribution(facID, self.ID, factoryInfo[facID].closestEnemy()[1])))
         weightedFrontlineFactories = sorted(weightedFrontlineFactories, key=lambda x: x[1], reverse=True)
 
@@ -1009,16 +989,16 @@ class Factory(object):
                 self.troops = curTroops
                 return self.actions
             normScore = scoreTup[1] - minScore
-            weightedTroops = max(curTroops,int((normScore/max(1,totScore))*totTroops))
+            weightedTroops = max(curTroops,int((float)(normScore/max(1,totScore))*totTroops))
             if (weightedTroops <= curTroops):
                 self.actions.append(MOVE([self.ID, scoreTup[0], weightedTroops]))
-                print(self.actions[-1].print(), file=sys.stderr)
+                print >> sys.stderr, self.actions[-1].printCmd()
                 curTroops -= weightedTroops
 
         # Just send whatever amts of troops off to the highest-weighted factory
         if (curTroops > 0 and len(weightedFrontlineFactories) > 0):
             self.actions.append(MOVE([self.ID, weightedFrontlineFactories[0][0], curTroops]))
-            print(self.actions[-1].print(), file=sys.stderr)
+            print >> sys.stderr, self.actions[-1].printCmd()
             curTroops -= curTroops
 
         self.troops = curTroops
@@ -1049,8 +1029,6 @@ class Strategizer(object):
                     continue
                 args = [1, move.origin, move.target, move.size, adjMatrix[move.origin][move.target]]
                 curPacket = TroopMsg(self.simulIDCounter, args)
-                if (move.redirect == False):
-                    curPacket.avoidRedirect()
                 self.simulIDCounter += 1
                 self.simulation[move.target].pushIncomming(curPacket)
                 # print("Pushed: "+move.print()+" to Factory: {0} | CurPackets: {1}".format(move.target, len(self.simulation[move.target].incomming)), file=sys.stderr)
@@ -1070,18 +1048,18 @@ class Strategizer(object):
         for i in range(len(self.resolutions)):
             simulState = self.resolutions[i]
             if (simulState[-1].owner == 1 and self.simulation[i].owner != 1):
-                print("Battle for {0} resolved in our favor, preventing further troops".format(i), file=sys.stderr)
+                print >> sys.stderr, "Battle for {0} resolved in our favor, preventing further troops".format(i)
                 # Add target to blacklist
                 self.blacklistedEnemies.append(i)
         
         # 1) Sends reinforcements
         for fac in myFactories:
-            print("Factory {0} reinforcing...".format(fac.ID), file=sys.stderr)
+            print >> sys.stderr, "Factory {0} reinforcing...".format(fac.ID)
             fac.reinforce(self.resolutions)
 
         # 2) Re-evaluates attack options
         for fac in myFactories:
-            print("======================\nFactory {0} attacking...\n======================".format(fac.ID), file=sys.stderr)
+            print >> sys.stderr, "======================\nFactory {0} attacking...\n======================".format(fac.ID)
             fac.updateBlacklist(self.blacklistedEnemies)
             fac.attack(self.resolutions)
 
@@ -1109,8 +1087,6 @@ class Strategizer(object):
             # print("Redirecting for target Factory {0} | Packets: {1}".format(fac.ID, len(fac.incomming)), file=sys.stderr)
             delList = []
             for troop in fac.incomming:
-                if (troop.redirect == False):
-                    continue
                 closestIntermediate = floydWarPath[troop.origin][fac.ID][0]
                 ttt = floydWarMatrix[troop.origin][closestIntermediate]
                 closestIntermediateOwner = self.resolutions[closestIntermediate][ttt].owner
@@ -1129,12 +1105,12 @@ class Strategizer(object):
                     fac.delIncomming(delList[i])
 
     def prune(self): #TODO: prunes excess troops sent and orgnize co-ordinated attacks
-        # simulatedSituation = [fac.resolve() for fac in self.simulation]
         return None
 
     def whack(self): #TODO: Barrage with all available troops
         myFactories = [self.simulation[facID] for facID in range(NUM_FACTORIES) if (self.simulation[facID].owner == 1)] # Own factories
         whackActions = []
+        #TODO: All focus whack on a single enemy factory?
         for fac in myFactories:
             if (fac.getAvailTroops(self.resolutions) < 1 or fac.production < 3):
                 continue
@@ -1145,37 +1121,37 @@ class Strategizer(object):
                 if (closestIntermediate != -1):
                     targetID = closestIntermediate
                 whackActions.append(MOVE([fac.ID, targetID, fac.getAvailTroops(self.resolutions)]))
-                print(whackActions[-1].print(), file=sys.stderr)
+                print >> sys.stderr, whackActions[-1].printCmd()
                 fac.troops -= fac.getAvailTroops(self.resolutions)
         self.simulate(whackActions)
         return None
 
-    def print(self):
+    def printCmd(self):
         # Adds movement commands
         for fac in self.simulation:
             for troop in fac.incomming:
-                self.actions.append(MOVE([troop.origin,fac.ID,troop.size]).print())
+                self.actions.append(MOVE([troop.origin,fac.ID,troop.size]).printCmd())
         # Adds bomb commands
         for bomb in self.bombs:
-            self.actions.append(bomb.print())
+            self.actions.append(bomb.printCmd())
         # Adds upgrade commands
         for action in self.evalActions:
             if (action.form == "INC"):
-                self.actions.append(action.print())
+                self.actions.append(action.printCmd())
         for inc in self.incs:
-            self.actions.append(inc.print())
+            self.actions.append(inc.printCmd())
         # Adds in debuggin message
         if (MSG_OUTPUT):
             self.actions.append("MSG {0}".format(MSG_CONTENT))
         # Outputs current turn's actions
         if (len(self.actions) < 1):
-            print("WAIT")
+            print "WAIT"
         else:
             outputCommand = ""
             for cmd in self.actions:
                 outputCommand += ";"
                 outputCommand += cmd
-            print(outputCommand[1:])
+            print outputCommand[1:]
 
 # Handle Inputs
 NUM_FACTORIES = int(input())  # Number of factories
@@ -1189,7 +1165,7 @@ for i in range(NUM_FACTORIES): # Initialize Factories
     simulFac.append(Factory(i))
 link_count = int(input())  # Number of links between factories
 for i in range(link_count): # Initialize adjList/adjMatrix
-    factory_1, factory_2, distance = [int(j) for j in input().split()]
+    factory_1, factory_2, distance = [int(j) for j in raw_input().split()]
     adjList[factory_1].append((factory_2, distance))
     adjList[factory_2].append((factory_1, distance))
     adjMatrix[factory_1][factory_2] = distance
@@ -1271,7 +1247,7 @@ while True:
     # Reads game turn state
     entity_count = int(input())  # the number of entities (e.g. factories and troops)
     for i in range(entity_count):
-        entity_id, entity_type, arg_1, arg_2, arg_3, arg_4, arg_5 = input().split()
+        entity_id, entity_type, arg_1, arg_2, arg_3, arg_4, arg_5 = raw_input().split()
         entity_id = int(entity_id)
         args = [int(arg_1), int(arg_2), int(arg_3), int(arg_4), int(arg_5)]
         if (entity_type == "FACTORY"):
@@ -1302,8 +1278,9 @@ while True:
                 INITIAL_FACTORY = curFac.ID
             if (curFac.owner == -1 and INITIAL_FACTORY_ENEMY == -1):
                 INITIAL_FACTORY_ENEMY = curFac.ID
+    print >> sys.stderr, "Map Distance: {0}".format(adjMatrix[INITIAL_FACTORY][INITIAL_FACTORY_ENEMY])
     if (adjMatrix[INITIAL_FACTORY][INITIAL_FACTORY_ENEMY] >= MAP_RUSH_SIZE):
-        BOMB_SCORE_THRESHOLD = 1.00
+        BOMB_SCORE_THRESHOLD = BOMB_SCORE_THRESHOLD_LARGE
 
     # Searches for frontline factory
     FRONTLINE_FACTORY = -1
@@ -1318,7 +1295,7 @@ while True:
             if (nearestFactory != -1 and nearestDistance < FRONTLINE_DISTANCE):
                 FRONTLINE_DISTANCE = nearestDistance
                 FRONTLINE_FACTORY = curFac.ID
-                print("Determined FRONTLINE factory: {0}".format(FRONTLINE_FACTORY), file=sys.stderr)
+                print >> sys.stderr, "Determined FRONTLINE factory: {0}".format(FRONTLINE_FACTORY)
 
     #TODO: Simulates Nearby enemies' attacks upon self
     currentSituation = [fac.resolve() for fac in factoryInfo]
@@ -1337,39 +1314,28 @@ while True:
                     enemyPacket = TroopMsg(simulIDCounter, args)
                     simulIDCounter += 1
                     factoryInfo[enemyPacket.target].pushIncomming(enemyPacket)
-
+    enemySimulatedSituation = [fac.resolve() for fac in factoryInfo] if (SIMULATE_ENEMY) else currentSituation
+    
     # Launch BOMBS!
+    #TODO: Launch bombs in prune()?
     if (num_bombs > 0 and FRONTLINE_FACTORY != -1):
-        print("Attempting BOMB | Scoring from Factory {0}".format(FRONTLINE_FACTORY), file=sys.stderr)
+        print >> sys.stderr, "Attempting BOMB | Scoring from Factory {0}".format(FRONTLINE_FACTORY)
         # Scores all enemy factores for bombing! :D
-        bombTargets = [(fac.ID, scoreBomb(fac.ID, FRONTLINE_FACTORY, currentSituation)) for fac in factoryInfo]
+        bombTargets = [(fac.ID, scoreBomb(fac.ID, (FRONTLINE_FACTORY if factoryInfo[fac.ID].closestFriendly()[0] == -1 else factoryInfo[fac.ID].closestFriendly()[0]), currentSituation)) for fac in factoryInfo]
         bombTargets = sorted(bombTargets, key=lambda x: x[1], reverse=True)
         for targetTup in bombTargets:
             if (num_bombs < 1 or len(myFactories) < 1):
                 break
             target = targetTup[0]
             score = targetTup[1]
-            #EXPERIMENTAL: Do not bomb targets we're currently attacking
-            targetIncomming = factoryInfo[target].incomming
-            attacking = False
-            for packet in targetIncomming:
-                if (packet.owner == 1):
-                    attacking = True
-            if (attacking):
-                continue
             # Find the closest base to launch bomb from
-            nearestFactory = myFactories[0]
-            nearestDistance = MAX_INT
-            for facID in range(NUM_FACTORIES):
-                if (facID not in myFactories or facID == target):
-                    continue
-                if (adjMatrix[facID][target] < nearestDistance):
-                    nearestDistance = adjMatrix[facID][target]
-                    nearestFactory = facID
+            nearestFactory = factoryInfo[target].closestFriendly()[0]
+            if (nearestFactory == -1):
+                nearestFactory = FRONTLINE_FACTORY
             # Do not bomb a target that would be captured upon ttt
-            if (not should_bomb(target, nearestFactory, currentSituation)):
+            if (not should_bomb(target, nearestFactory, enemySimulatedSituation)):
                 continue
-            print("Factory {0} Score: {1}".format(target, score), file=sys.stderr)
+            print >> sys.stderr, "Factory {0} Score: {1}".format(target, score)
             launch = True
             # Only bomb targets above threshold score
             if (score < BOMB_SCORE_THRESHOLD):
@@ -1390,7 +1356,7 @@ while True:
 
     # Constructs simulated scenario to feed into strategizer
     for move in turnMoves:
-        print(move.print(), file=sys.stderr)
+        print >> sys.stderr, move.printCmd()
         if (move.isMove()):
             args = [1, move.origin, move.target, move.size, adjMatrix[move.origin][move.target]]
             curPacket = TroopMsg(simulIDCounter, args)
@@ -1403,7 +1369,7 @@ while True:
                 turnIncs.append(move)
 
     # Feed Strategizer
-    strategize = Strategizer([fac.resolve() for fac in factoryInfo], simulFac, turnBombs, turnIncs, simulIDCounter)
+    strategize = Strategizer(enemySimulatedSituation, simulFac, turnBombs, turnIncs, simulIDCounter)
 
     # Strategize!
     strategize.execute() # Executes strategy for turn
@@ -1433,4 +1399,4 @@ while True:
         MSG_CONTENT = delay+HITCHHIKER_GALAXY_QUOTES[MSG_RANDIDX][min(len(HITCHHIKER_GALAXY_QUOTES[MSG_RANDIDX]), MSG_START):min(len(HITCHHIKER_GALAXY_QUOTES[MSG_RANDIDX]), MSG_END)]
 
     # Output final strategy for the turn
-    strategize.print()
+    strategize.printCmd()

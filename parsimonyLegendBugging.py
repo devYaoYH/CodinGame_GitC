@@ -15,7 +15,7 @@ MSG_START = 0
 MSG_END = MSG_MAXLEN
 MSG_OUTPUT = False
 SHOW_RESOLUTION = False
-SHOW_ENEMY_ATTACKS = False
+SHOW_ENEMY_ATTACKS = True
 
 #########################
 # Hitchhiker's Guide :O #
@@ -31,8 +31,9 @@ BOMB_FOLLOWUP = False
 ########################
 # Behavioural Controls #
 ########################
-MAP_RUSH_SIZE = 10
+MAP_RUSH_SIZE = 13
 BOMB_SCORE_THRESHOLD = 0.57
+BOMB_SCORE_THRESHOLD_LARGE = 1.03
 MAX_LINK_DISTANCE = 7
 ENEMY_MAX_LINK = 7
 
@@ -48,7 +49,7 @@ BOMB_TROOP_THRESHOLD = 25
 # Movement Constants
 TROOP_OFFENSIVE = 1.00 # Sends this % of troops against superior enemies
 TROOP_DEFENSIVE = 1.00 # Sends this % of troops to reinforce friendly targets
-TROOP_OFFENSIVE_MULTIPLIER = 1.00
+TROOP_OFFENSIVE_MULTIPLIER = 1.17
 TROOP_EXCESS_NEUTRAL = 1
 TROOP_EXCESS_ENEMY = 1
 ENEMY_OFFENSIVE = 1.97 # How offensive is the enemy
@@ -167,7 +168,7 @@ def scoreRedistribution(tgtID, curID, closestEnemyDistance):
 
 def scoreUpgrade(tgtID, curID, closestEnemyDistance): #EXPERIMENTAL: Scoring for which factory to upgrade first
     distanceMultiplier = closestEnemyDistance**0.5
-    score = distanceMultiplier
+    score = distanceMultiplier*(1/max(1, factoryInfo[tgtID].troops))
     # print("{0} Score: {1}".format(tgtID, score), file=sys.stderr)
     return score
 
@@ -189,11 +190,13 @@ def scoreBomb(tgtID, curID, resolutions):
     return score
         
 def should_bomb(tgtID, curID, resolutions):
+    print("Testing target Factory {0}:".format(tgtID), file=sys.stderr)
     if (tgtID == curID):
         return False
     targetStates = resolutions[tgtID]
     ttt = adjMatrix[curID][tgtID]+1
     tttState = targetStates[ttt]
+    print("Ttt state: Owner->{0} | Troops->{1} | Production->{2}".format(tttState.owner, tttState.troops, tttState.production), file=sys.stderr)
     if (tttState.owner != -1):
         return False
     if (num_bombs < 1):
@@ -563,6 +566,20 @@ class Factory(object):
         else:
             return (nearestFactory, MAX_INT)
 
+    def closestFriendly(self):
+        nearestFactory = -1
+        nearestDistance = MAX_INT
+        for facID in range(NUM_FACTORIES):
+            if (facID == self.ID):
+                continue
+            if (adjMatrix[self.ID][facID] < nearestDistance and factoryInfo[facID].owner == 1):
+                nearestDistance = adjMatrix[self.ID][facID]
+                nearestFactory = facID
+        if (nearestFactory != -1):
+            return (nearestFactory, nearestDistance)
+        else:
+            return (nearestFactory, MAX_INT)
+
     def viable_upgrade(self, resolution, prevUpgrades):
         updatedResolutions = []
         # Builds updated states for next FACTORY_UPGRADE_COST turns
@@ -787,6 +804,18 @@ class Factory(object):
         upgradeFactory = True
         curProduction = self.production
         upgrades = 0
+        #EXPERIMENTAL: Don't too aggressively upgrade factories close to the enemy
+        adjFriendlyTup = self.closestFriendly()
+        adjEnemyTup = self.closestEnemy()
+        if (adjFriendlyTup[0] == -1): # Initial Factory or only factory
+            if (adjEnemyTup[0] != -1):
+                if (adjEnemyTup[1] < MAP_RUSH_SIZE):
+                    upgradeFactory = False
+        if (adjFriendlyTup[0] != -1 and adjEnemyTup[0] != -1):
+            # print("Testing viability for upgrade based on distance to enemy", file=sys.stderr)
+            # print("Distance to friendly factory {0}: {1} | Distance to enemy factory {2}: {3}".format(adjFriendlyTup[0], adjFriendlyTup[1], adjEnemyTup[0], adjEnemyTup[1]), file=sys.stderr)
+            if (adjEnemyTup[1] <= adjFriendlyTup[1] and (CYBORGS_OWN - CYBORGS_ENEMY) < FACTORY_UPGRADE_COST):
+                upgradeFactory = False
         # Decides suitability for upgrading
         while (upgradeFactory):
             # Safety check for troops available
@@ -802,7 +831,7 @@ class Factory(object):
                 tttState = targetStates[ttt]
                 if (tttState.owner == 0 and tttState.production > 0):
                     tttDiff = FACTORY_UPGRADE_COST - ttt
-                    if (tttDiff < 0 or tttState.production*tttDiff > FACTORY_UPGRADE_COST):
+                    if (tttDiff < 0 or tttState.production*tttDiff > FACTORY_UPGRADE_COST and tttState.troops < curTroops):
                         neutralFactories.append(targetFac.ID)
             if (len(neutralFactories) > 0):
                 upgradeFactory = False
@@ -892,7 +921,7 @@ class Factory(object):
                 #     print("Suspend attacks", file=sys.stderr)
                 #     self.troops = curTroops
                 #     return self.actions
-                # else: # Unable to overwhelm target immediately
+                else: # Unable to overwhelm target immediately
                     targetTroops = int(self.TROOP_OFFENSIVE*curTroops)
                     print("Cannot overwhelm, sending {0} troops".format(targetTroops), file=sys.stderr)
                     targetAttack = True
@@ -935,8 +964,14 @@ class Factory(object):
             return self.actions
         # Scans and weights nearby factories
         weightedTargets = []
+        myEnemyTup = self.closestEnemy()
         for adj in adjList[self.ID]:
-            weightedTargets.append((adj, scoreUpgrade(adj[0], self.ID, factoryInfo[adj[0]].closestEnemy()[1])))
+            pushUpgradeTroops = True
+            adjEnemyTup = factoryInfo[adj[0]].closestEnemy()
+            if (adjEnemyTup[0] != -1 and myEnemyTup[0] != -1 and adjEnemyTup[1] < myEnemyTup[1]):
+                pushUpgradeTroops = False
+            if (pushUpgradeTroops):
+                weightedTargets.append((adj, scoreUpgrade(adj[0], self.ID, factoryInfo[adj[0]].closestEnemy()[1])))
         weightedTargets = sorted(weightedTargets, key=lambda x: x[1], reverse=True)
         #EXPERIMENTAL: Sends troops based on priority
         for targetTup in weightedTargets:
@@ -946,7 +981,9 @@ class Factory(object):
                 self.troops = curTroops
                 return self.actions
             adjFac = factoryInfo[adj[0]]
-            requestTroops = min(curTroops, needed_upgradeTroops(self, adjFac, simulStates))
+            #EXPERIMENTAL: We send units in bulk
+            # requestTroops = min(curTroops, needed_upgradeTroops(self, adjFac, simulStates))
+            requestTroops = needed_upgradeTroops(self, adjFac, simulStates)
             if (requestTroops > 0 and requestTroops <= curTroops):
                 self.actions.append(MOVE([self.ID, adjFac.ID, requestTroops]))
                 print(self.actions[-1].print(), file=sys.stderr)
@@ -1121,6 +1158,7 @@ class Strategizer(object):
     def whack(self): #TODO: Barrage with all available troops
         myFactories = [self.simulation[facID] for facID in range(NUM_FACTORIES) if (self.simulation[facID].owner == 1)] # Own factories
         whackActions = []
+        #TODO: All focus whack on a single enemy factory?
         for fac in myFactories:
             if (fac.getAvailTroops(self.resolutions) < 1 or fac.production < 3):
                 continue
@@ -1231,7 +1269,7 @@ for k in range(NUM_FACTORIES):
         for j in range(NUM_FACTORIES):
             if (i==j or k==j):
                 continue
-            intermediate = floydWarMatrix[i][k] + floydWarMatrix[k][j]
+            intermediate = floydWarMatrix[i][k] + floydWarMatrix[k][j] + 1
             if (intermediate < floydWarMatrix[i][j]):
                 newPath = [k]
                 newPath.extend(floydWarPath[k][j])
@@ -1288,8 +1326,9 @@ while True:
                 INITIAL_FACTORY = curFac.ID
             if (curFac.owner == -1 and INITIAL_FACTORY_ENEMY == -1):
                 INITIAL_FACTORY_ENEMY = curFac.ID
+    print("Map Distance: {0}".format(adjMatrix[INITIAL_FACTORY][INITIAL_FACTORY_ENEMY]), file=sys.stderr)
     if (adjMatrix[INITIAL_FACTORY][INITIAL_FACTORY_ENEMY] >= MAP_RUSH_SIZE):
-        BOMB_SCORE_THRESHOLD = 1.00
+        BOMB_SCORE_THRESHOLD = BOMB_SCORE_THRESHOLD_LARGE
 
     # Searches for frontline factory
     FRONTLINE_FACTORY = -1
@@ -1323,12 +1362,13 @@ while True:
                     enemyPacket = TroopMsg(simulIDCounter, args)
                     simulIDCounter += 1
                     factoryInfo[enemyPacket.target].pushIncomming(enemyPacket)
-
+    enemySimulatedSituation = [fac.resolve() for fac in factoryInfo] if (SIMULATE_ENEMY) else currentSituation
+    
     # Launch BOMBS!
     if (num_bombs > 0 and FRONTLINE_FACTORY != -1):
         print("Attempting BOMB | Scoring from Factory {0}".format(FRONTLINE_FACTORY), file=sys.stderr)
         # Scores all enemy factores for bombing! :D
-        bombTargets = [(fac.ID, scoreBomb(fac.ID, FRONTLINE_FACTORY, currentSituation)) for fac in factoryInfo]
+        bombTargets = [(fac.ID, scoreBomb(fac.ID, (FRONTLINE_FACTORY if factoryInfo[fac.ID].closestFriendly()[0] == -1 else factoryInfo[fac.ID].closestFriendly()[0]), currentSituation)) for fac in factoryInfo]
         bombTargets = sorted(bombTargets, key=lambda x: x[1], reverse=True)
         for targetTup in bombTargets:
             if (num_bombs < 1 or len(myFactories) < 1):
@@ -1338,22 +1378,28 @@ while True:
             #EXPERIMENTAL: Do not bomb targets we're currently attacking
             targetIncomming = factoryInfo[target].incomming
             attacking = False
+            attackingTtt = MAX_INT
             for packet in targetIncomming:
                 if (packet.owner == 1):
                     attacking = True
-            if (attacking):
-                continue
+                    if (packet.ttt < attackingTtt):
+                        attackingTtt = packet.ttt
             # Find the closest base to launch bomb from
-            nearestFactory = myFactories[0]
-            nearestDistance = MAX_INT
-            for facID in range(NUM_FACTORIES):
-                if (facID not in myFactories or facID == target):
-                    continue
-                if (adjMatrix[facID][target] < nearestDistance):
-                    nearestDistance = adjMatrix[facID][target]
-                    nearestFactory = facID
+            nearestFactory = factoryInfo[target].closestFriendly()[0]
+            if (nearestFactory == -1):
+                nearestFactory = FRONTLINE_FACTORY
+            if (attacking and packet.ttt < adjMatrix[nearestFactory][target]):
+                continue
+            # nearestFactory = myFactories[0]
+            # nearestDistance = MAX_INT
+            # for facID in range(NUM_FACTORIES):
+            #     if (facID not in myFactories or facID == target):
+            #         continue
+            #     if (adjMatrix[facID][target] < nearestDistance):
+            #         nearestDistance = adjMatrix[facID][target]
+            #         nearestFactory = facID
             # Do not bomb a target that would be captured upon ttt
-            if (not should_bomb(target, nearestFactory, currentSituation)):
+            if (not should_bomb(target, nearestFactory, enemySimulatedSituation)):
                 continue
             print("Factory {0} Score: {1}".format(target, score), file=sys.stderr)
             launch = True
@@ -1389,7 +1435,7 @@ while True:
                 turnIncs.append(move)
 
     # Feed Strategizer
-    strategize = Strategizer([fac.resolve() for fac in factoryInfo], simulFac, turnBombs, turnIncs, simulIDCounter)
+    strategize = Strategizer(enemySimulatedSituation, simulFac, turnBombs, turnIncs, simulIDCounter)
 
     # Strategize!
     strategize.execute() # Executes strategy for turn
